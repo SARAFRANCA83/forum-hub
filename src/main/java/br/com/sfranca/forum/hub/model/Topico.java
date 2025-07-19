@@ -1,7 +1,5 @@
 package br.com.sfranca.forum.hub.model;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -20,15 +18,21 @@ public class Topico {
 
     private String mensagem;
 
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    private LocalDateTime dataCriacao;
 
     @Enumerated(EnumType.STRING)
     private StatusTopico status = StatusTopico.NAO_RESPONDIDO;
 
     @ManyToOne
+    @JoinColumn(name = "autor_id")
     private Usuario autor;
 
     @ManyToOne
+    @JoinColumn(name = "curso_id")
     private Curso curso;
-}
 
+    @PrePersist
+    public void prePersist() {
+        this.dataCriacao = LocalDateTime.now();
+    }
+}
