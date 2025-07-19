@@ -35,4 +35,21 @@ public class Topico {
     public void prePersist() {
         this.dataCriacao = LocalDateTime.now();
     }
+
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setMensagem(String mensagem) {
+        this.mensagem = mensagem;
+    }
+
+    public void setAutor(Usuario autor) {
+        this.autor = autor;
+    }
+
+    public void setCurso(Curso curso) {
+        this.curso = curso;
+    }
 }
