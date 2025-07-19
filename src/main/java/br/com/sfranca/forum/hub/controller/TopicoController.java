@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
 
 
 @RestController
@@ -95,4 +96,22 @@ public class TopicoController {
 
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TopicoResponseDTO> detalhar(@PathVariable Long id) {
+        Topico topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tópico não encontrado"));
+
+        TopicoResponseDTO dto = new TopicoResponseDTO(
+                topico.getTitulo(),
+                topico.getMensagem(),
+                topico.getDataCriacao(),
+                topico.getStatus(),
+                topico.getAutor().getNome(),
+                topico.getCurso().getNome()
+        );
+
+        return ResponseEntity.ok(dto);
+    }
+
 }
