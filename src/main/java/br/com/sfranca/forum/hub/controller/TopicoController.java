@@ -2,6 +2,7 @@ package br.com.sfranca.forum.hub.controller;
 
 import br.com.sfranca.forum.hub.dto.TopicoRequestDTO;
 import br.com.sfranca.forum.hub.dto.TopicoResponseDTO;
+import br.com.sfranca.forum.hub.dto.TopicoUpdateDTO;
 import br.com.sfranca.forum.hub.model.Curso;
 import br.com.sfranca.forum.hub.model.Topico;
 import br.com.sfranca.forum.hub.model.Usuario;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 
 @RestController
@@ -112,6 +115,40 @@ public class TopicoController {
         );
 
         return ResponseEntity.ok(dto);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Topico> atualizar(@PathVariable Long id, @RequestBody @Valid TopicoUpdateDTO dto) {
+        Optional<Topico> topicoOptional = topicoRepository.findById(id);
+
+        if (topicoOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Topico topicoExistente = topicoOptional.get();
+
+        // Verifica duplicação (mas ignora o próprio tópico que está sendo atualizado)
+        boolean existeOutroTopicoIgual = topicoRepository.existsByTituloAndMensagem(dto.titulo(), dto.mensagem())
+                && (!topicoExistente.getTitulo().equals(dto.titulo()) || !topicoExistente.getMensagem().equals(dto.mensagem()));
+
+        if (existeOutroTopicoIgual) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // Busca autor e curso
+        Usuario autor = usuarioRepository.findById(dto.autorId())
+                .orElseThrow(() -> new RuntimeException("Autor não encontrado"));
+        Curso curso = cursoRepository.findById(dto.cursoId())
+                .orElseThrow(() -> new RuntimeException("Curso não encontrado"));
+
+        // Atualiza os dados
+        topicoExistente.setTitulo(dto.titulo());
+        topicoExistente.setMensagem(dto.mensagem());
+        topicoExistente.setAutor(autor);
+        topicoExistente.setCurso(curso);
+
+        topicoRepository.save(topicoExistente);
+
+        return ResponseEntity.ok(topicoExistente);
     }
 
 }
