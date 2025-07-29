@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/topicos")
 public class TopicoController {
@@ -128,4 +130,16 @@ public class TopicoController {
 
         return ResponseEntity.ok(topicoExistente);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        Optional<Topico> topicoOptional = topicoRepository.findById(id);
+
+        if (topicoOptional.isPresent()) {
+            topicoRepository.deleteById(id);
+            return ResponseEntity.noContent().build(); // HTTP 204
+        } else {
+            return ResponseEntity.notFound().build(); // HTTP 404
+        }
+    }
+
 }
