@@ -1,6 +1,9 @@
 package br.com.sfranca.forum.hub.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -22,4 +25,6 @@ public class Usuario {
 
     @Column(nullable = false)
     private String senha;
+
+
 }
